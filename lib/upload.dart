@@ -1,6 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as Path;
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:exif/exif.dart';
@@ -26,6 +30,27 @@ List<double> getCoordinates(Map<String, IfdTag> exif) {
   } else {
     return null;
   }
+}
+
+Future<String> uploadImage(image) async {
+  final StorageReference ref = FirebaseStorage.instance
+      .ref()
+      .child('images/${Path.basename(image.path)}}');
+  final StorageUploadTask uploadTask = ref.putFile(
+    image,
+    StorageMetadata(
+      contentLanguage: 'en',
+    ),
+  );
+  final downloadURL = await (await uploadTask.onComplete).ref.getDownloadURL();
+  return downloadURL.toString();
+}
+
+Future<void> createPost(String downloadURL, List coordinates) async {
+  Firestore.instance.collection('posts').document().setData({
+    'image': downloadURL,
+    'location': GeoPoint(coordinates[0], coordinates[1])
+  });
 }
 
 Widget sourceAlert(context) {
@@ -57,7 +82,7 @@ class UploadPage extends StatefulWidget {
 
 class _UploadPageState extends State<UploadPage> {
   File _image;
-  var _coordinates;
+  List _coordinates;
 
   Future getImage() async {
     while (!await Permission.locationWhenInUse.isGranted) {
@@ -78,7 +103,8 @@ class _UploadPageState extends State<UploadPage> {
             .getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
         _coordinates = [position.latitude, position.longitude];
       } else if (imageSource == ImageSource.gallery) {
-        _coordinates = getCoordinates(await readExifFromBytes(await _image.readAsBytes()));
+        _coordinates =
+            getCoordinates(await readExifFromBytes(await _image.readAsBytes()));
         if (_coordinates == null) {
           LocationResult result = await showLocationPicker(
               context, "[YOUR API KEY HERE]");
@@ -88,6 +114,7 @@ class _UploadPageState extends State<UploadPage> {
         }
       }
     }
+    createPost(await uploadImage(_image), _coordinates);
     setState(() {});
   }
 
