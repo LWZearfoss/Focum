@@ -107,7 +107,7 @@ class _UploadPageState extends State<UploadPage> {
             getCoordinates(await readExifFromBytes(await _image.readAsBytes()));
         if (_coordinates == null) {
           LocationResult result = await showLocationPicker(
-              context, "[YOUR API KEY HERE]");
+              context, "AIzaSyBrGsu1dFfz5O9TCUdSVIsmyhVS6ejikcQ");
           _coordinates = result == null
               ? null
               : [result.latLng.latitude, result.latLng.longitude];
