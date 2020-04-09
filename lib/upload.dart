@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as Path;
 
+import 'package:focum/api_key.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -107,7 +109,7 @@ class _UploadPageState extends State<UploadPage> {
             getCoordinates(await readExifFromBytes(await _image.readAsBytes()));
         if (_coordinates == null) {
           LocationResult result = await showLocationPicker(
-              context, "AIzaSyBrGsu1dFfz5O9TCUdSVIsmyhVS6ejikcQ");
+              context, apiKey);
           _coordinates = result == null
               ? null
               : [result.latLng.latitude, result.latLng.longitude];
