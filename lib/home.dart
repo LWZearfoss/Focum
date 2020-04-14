@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:focum/auth.dart';
 import 'package:focum/login.dart';
 import 'package:focum/upload.dart';
+import 'package:focum/map.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -16,19 +17,30 @@ class HomePage extends StatelessWidget {
             icon: Icon(Icons.exit_to_app),
             onPressed: () {
               signOutGoogle();
-              Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => LoginPage()));
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => LoginPage()));
             },
           ),
         ],
       ),
       body: Center(
-        child: RaisedButton(
-          child: Text('Upload Image'),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => UploadPage()));
-          },
+        child: Column(
+          children: <Widget>[
+            RaisedButton(
+              child: Text('Upload Image'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => UploadPage()));
+              },
+            ),
+            RaisedButton(
+              child: Text('Map'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PostMapPage()));
+              },
+            ),
+          ],
         ),
       ),
     );
