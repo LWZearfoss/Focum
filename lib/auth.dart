@@ -10,43 +10,52 @@ String imageUrl;
 String userId;
 
 Future<String> signInWithGoogle() async {
-  final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-  final GoogleSignInAuthentication googleSignInAuthentication =
-  await googleSignInAccount.authentication;
+  try {
+    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
 
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleSignInAuthentication.accessToken,
-    idToken: googleSignInAuthentication.idToken,
-  );
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
 
-  final AuthResult authResult = await _auth.signInWithCredential(credential);
-  final FirebaseUser user = authResult.user;
+    final AuthResult authResult = await _auth.signInWithCredential(credential);
+    final FirebaseUser user = authResult.user;
 
-  // Checking if email and name is null
-  assert(user.email != null);
-  assert(user.displayName != null);
-  assert(user.photoUrl != null);
+    if (user.email == null ||
+        user.displayName == null ||
+        user.photoUrl == null) {
+      return null;
+    }
 
-  name = user.displayName;
-  email = user.email;
-  imageUrl = user.photoUrl;
+    name = user.displayName;
+    email = user.email;
+    imageUrl = user.photoUrl;
 
-  // Only taking the first part of the name, i.e., First Name
-  if (name.contains(" ")) {
-    name = name.substring(0, name.indexOf(" "));
+    // Only taking the first part of the name, i.e., First Name
+    if (name.contains(" ")) {
+      name = name.substring(0, name.indexOf(" "));
+    }
+
+    if (user.isAnonymous || await user.getIdToken() == null) {
+      return null;
+    }
+
+    final FirebaseUser currentUser = await _auth.currentUser();
+
+    if (user.uid != currentUser.uid) {
+      return null;
+    }
+
+    userId = user.uid;
+    return 'signInWithGoogle succeeded: $user';
+  } catch (error) {
+    return null;
   }
-
-  assert(!user.isAnonymous);
-  assert(await user.getIdToken() != null);
-
-  final FirebaseUser currentUser = await _auth.currentUser();
-  assert(user.uid == currentUser.uid);
-  userId = user.uid;
-
-  return 'signInWithGoogle succeeded: $user';
 }
 
 void signOutGoogle() async {
   await googleSignIn.signOut();
-  userId=null;
+  userId = null;
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PostMapPage extends StatelessWidget {
@@ -23,23 +24,22 @@ class PostMap extends StatefulWidget {
 }
 
 class PostMapState extends State<PostMap> {
-  final Firestore _database = Firestore.instance;
   Completer<GoogleMapController> _controller = Completer();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  CameraPosition _locationCamera;
 
   @override
   void initState() {
-    createMarkers();
     super.initState();
-  }
-
-  createMarkers() {
-    _database.collection('posts').getDocuments().then((posts) {
-      if (posts.documents.isNotEmpty) {
-        for (int i = 0; i < posts.documents.length; ++i) {
-          initMarker(posts.documents[i].data, posts.documents[i].documentID);
-        }
-      }
+    Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((position) {
+      setState(() {
+        _locationCamera = CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 14.4746,
+        );
+      });
     });
   }
 
@@ -48,30 +48,45 @@ class PostMapState extends State<PostMap> {
     final Marker marker = Marker(
       markerId: markerId,
       position: LatLng(post['location'].latitude, post['location'].longitude),
+      infoWindow: InfoWindow(title: post['location'].latitude.toString() + ',' + post['location'].longitude.toString(), )
     );
 
-    setState(() {
-      markers[markerId] = marker;
-    });
+    markers[markerId] = marker;
   }
-
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
-        myLocationEnabled: true,
-        markers: Set<Marker>.of(markers.values),
-      ),
+      body: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection('posts').snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return new Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                _locationCamera == null) {
+              return new Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              for (int i = 0; i < snapshot.data.documents.length; ++i) {
+                initMarker(snapshot.data.documents[i].data,
+                    snapshot.data.documents[i].documentID);
+              }
+              return new GoogleMap(
+                mapType: MapType.hybrid,
+                initialCameraPosition: _locationCamera,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                },
+                myLocationEnabled: true,
+                markers: Set<Marker>.of(markers.values),
+              );
+            }
+          }),
     );
   }
 }
