@@ -48,7 +48,7 @@ class PostMapState extends State<PostMap> {
     final Marker marker = Marker(
       markerId: markerId,
       position: LatLng(post['location'].latitude, post['location'].longitude),
-      infoWindow: InfoWindow(title: post['location'].latitude.toString() + ',' + post['location'].longitude.toString(), )
+      infoWindow: InfoWindow(title: post['address'])
     );
 
     markers[markerId] = marker;

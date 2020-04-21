@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:focum/auth.dart';
 import 'package:focum/login.dart';
+import 'package:focum/list.dart';
 import 'package:focum/upload.dart';
 import 'package:focum/map.dart';
 
@@ -38,6 +39,13 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => PostMapPage()));
+              },
+            ),
+            RaisedButton(
+              child: Text('List'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PostListPage()));
               },
             ),
           ],

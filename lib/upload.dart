@@ -49,9 +49,11 @@ Future<String> uploadImage(image) async {
 }
 
 Future<void> createPost(String downloadURL, List coordinates) async {
+  String address = (await Geolocator().placemarkFromCoordinates(coordinates[0], coordinates[1]))[0].thoroughfare;
   Firestore.instance.collection('posts').document().setData({
     'image': downloadURL,
-    'location': GeoPoint(coordinates[0], coordinates[1])
+    'location': GeoPoint(coordinates[0], coordinates[1]),
+    'address': address,
   });
 }
 
