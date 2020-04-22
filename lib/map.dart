@@ -51,6 +51,8 @@ class PostMapState extends State<PostMap> {
       infoWindow: InfoWindow(title: post['address'])
     );
 
+    //
+
     markers[markerId] = marker;
   }
 

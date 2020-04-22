@@ -25,30 +25,48 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            RaisedButton(
-              child: Text('Upload Image'),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => UploadPage()));
-              },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.pinkAccent, Colors.blueAccent]
             ),
-            RaisedButton(
-              child: Text('Map'),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PostMapPage()));
-              },
-            ),
-            RaisedButton(
-              child: Text('List'),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PostListPage()));
-              },
-            ),
-          ],
+          ),
+          child: Row(
+            //mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      RaisedButton.icon(onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => PostMapPage()));},
+                        icon: Icon(Icons.map),
+                        label: Text("Map"),
+                        color: Colors.blue,
+                      ),
+                      RaisedButton.icon(onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => UploadPage()));},
+                        icon: Icon(Icons.photo_camera),
+                        label: Text("Camera"),
+                        color: Colors.orangeAccent,
+                      ),
+                      RaisedButton.icon(onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => PostListPage()));},
+                          icon: Icon(Icons.photo),
+                          label: Text("Gallery"),
+                          color: Colors.lightGreen
+                      ),
+                    ],
+                  )
+              )
+            ],
+          ),
         ),
       ),
     );
