@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:focum/auth.dart';
+import 'package:focum/viewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostListPage extends StatelessWidget {
   final String posterId;
   final String posterName;
 
-  const PostListPage({Key key, this.posterId, this.posterName}) : super(key: key);
+  const PostListPage({Key key, this.posterId, this.posterName})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +43,30 @@ class PostListPage extends StatelessWidget {
                           snapshot.data.documents[index].data['image']),
                       title: Text('Location: ' +
                           snapshot.data.documents[index].data['address']),
-                      trailing: posterId == userId ? IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () {
-                          Firestore.instance.collection('posts').document(snapshot.data.documents[index].documentID).delete();
-                        },
-                      ) : null,
+                      trailing: posterId == userId
+                          ? IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () {
+                                Firestore.instance
+                                    .collection('posts')
+                                    .document(snapshot
+                                        .data.documents[index].documentID)
+                                    .delete();
+                              },
+                            )
+                          : null,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FullScreenWrapper(
+                              title: snapshot.data.documents[index].data['address'],
+                              imageProvider: NetworkImage(
+                                  snapshot.data.documents[index].data['image']),
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

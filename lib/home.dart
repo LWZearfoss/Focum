@@ -24,50 +24,66 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.pinkAccent, Colors.blueAccent]
+      body: Flex(
+        direction: Axis.vertical,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: FlatButton.icon(
+                    color: Color(0xFF8CA3D1),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PostMapPage()));
+                    },
+                    icon: Icon(Icons.map),
+                    label: Text("Map"),
+                  ),
+                ),
+                Expanded(
+                  child: FlatButton.icon(
+                    color: Color(0xFF726DA8),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => UploadPage()));
+                    },
+                    icon: Icon(Icons.photo_camera),
+                    label: Text("Camera"),
+                  ),
+                ),
+                Expanded(
+                  child: FlatButton.icon(
+                    color: Color(0xFF693794),
+                    textColor: Colors.white,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostListPage(
+                            posterId: userId,
+                            posterName: userName,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.photo),
+                    label: Text("Gallery"),
+                  ),
+                ),
+              ],
             ),
           ),
-          child: Row(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      RaisedButton.icon(onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => PostMapPage()));},
-                        icon: Icon(Icons.map),
-                        label: Text("Map"),
-                        color: Colors.blue,
-                      ),
-                      RaisedButton.icon(onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => UploadPage()));},
-                        icon: Icon(Icons.photo_camera),
-                        label: Text("Camera"),
-                        color: Colors.orangeAccent,
-                      ),
-                      RaisedButton.icon(onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => PostListPage(posterId: userId, posterName: userName,)));},
-                          icon: Icon(Icons.photo),
-                          label: Text("Gallery"),
-                          color: Colors.lightGreen
-                      ),
-                    ],
-                  )
-              )
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

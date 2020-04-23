@@ -79,7 +79,7 @@ class PostMapState extends State<PostMap> {
                     snapshot.data.documents[i].documentID);
               }
               return new GoogleMap(
-                mapType: MapType.hybrid,
+                mapType: MapType.normal,
                 initialCameraPosition: _locationCamera,
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
