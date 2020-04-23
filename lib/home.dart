@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Focum"),
+        title: Text("Welcome to Focum, " + userName),
         actions: <Widget>[
           // action button
           IconButton(
@@ -57,7 +57,7 @@ class HomePage extends StatelessWidget {
                       ),
                       RaisedButton.icon(onPressed: () {
                         Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => PostListPage()));},
+                            MaterialPageRoute(builder: (context) => PostListPage(posterId: userId, posterName: userName,)));},
                           icon: Icon(Icons.photo),
                           label: Text("Gallery"),
                           color: Colors.lightGreen

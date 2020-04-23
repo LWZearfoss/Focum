@@ -7,6 +7,7 @@ import 'package:path/path.dart' as Path;
 
 import 'package:focum/api_key.dart';
 
+import 'package:focum/auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,6 +59,8 @@ Future<void> createPost(String downloadURL, List coordinates) async {
     'image': downloadURL,
     'location': GeoPoint(coordinates[0], coordinates[1]),
     'address': address,
+    'userId': userId,
+    'userName': userName,
   });
 }
 
