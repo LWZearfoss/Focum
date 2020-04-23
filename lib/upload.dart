@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:focum/home.dart';
+import 'package:focum/login.dart';
 import 'package:path/path.dart' as Path;
 
 import 'package:focum/api_key.dart';
@@ -49,7 +51,9 @@ Future<String> uploadImage(image) async {
 }
 
 Future<void> createPost(String downloadURL, List coordinates) async {
-  String address = (await Geolocator().placemarkFromCoordinates(coordinates[0], coordinates[1]))[0].thoroughfare;
+  String address = (await Geolocator()
+          .placemarkFromCoordinates(coordinates[0], coordinates[1]))[0]
+      .thoroughfare;
   Firestore.instance.collection('posts').document().setData({
     'image': downloadURL,
     'location': GeoPoint(coordinates[0], coordinates[1]),
@@ -110,14 +114,19 @@ class _UploadPageState extends State<UploadPage> {
         _coordinates =
             getCoordinates(await readExifFromBytes(await _image.readAsBytes()));
         if (_coordinates == null) {
-          LocationResult result = await showLocationPicker(
-              context, apiKey);
+          LocationResult result = await showLocationPicker(context, apiKey);
           _coordinates = result == null
               ? null
               : [result.latLng.latitude, result.latLng.longitude];
         }
       }
     }
+    // set these two buttons to the button. If image is not null, render button.
+//    createPost(await uploadImage(_image), _coordinates);
+    setState(() {});
+  }
+
+  Future _upLButton() async {
     createPost(await uploadImage(_image), _coordinates);
     setState(() {});
   }
@@ -126,26 +135,182 @@ class _UploadPageState extends State<UploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Picker Example'),
+        title: Text('FOCUM'),
+        centerTitle: true,
       ),
-      body: Column(
-        children: <Widget>[
-          Center(
-              child: _image == null
-                  ? Text('No image selected.')
-                  : Image.file(_image)),
-          Center(
-              child: _coordinates == null
-                  ? Text('No location data')
-                  : Text(_coordinates[0].toString() +
-                      ', ' +
-                      _coordinates[1].toString())),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getImage,
-        tooltip: 'Pick Image',
-        child: Icon(Icons.add_a_photo),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.pinkAccent, Colors.blueAccent]),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Center(
+                child: _image == null && _coordinates == null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                            Text(
+                              'No Image Selected',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                        // bottomLeft
+                                        offset: Offset(-1.0, -1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // bottomRight
+                                        offset: Offset(1.0, -1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // topRight
+                                        offset: Offset(1.0, 1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // topLeft
+                                        offset: Offset(-1.0, 1.0),
+                                        color: Colors.black),
+                                  ]),
+                            ),
+                            Text(
+                              'No Location Data.',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                        // bottomLeft
+                                        offset: Offset(-1.0, -1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // bottomRight
+                                        offset: Offset(1.0, -1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // topRight
+                                        offset: Offset(1.0, 1.0),
+                                        color: Colors.black),
+                                    Shadow(
+                                        // topLeft
+                                        offset: Offset(-1.0, 1.0),
+                                        color: Colors.black),
+                                  ]),
+                            ),
+                            OutlineButton.icon(
+                                padding: const EdgeInsets.all(20.0),
+                                textColor: Colors.white,
+                                borderSide: BorderSide(color: Colors.black87),
+                                highlightedBorderColor: Colors.white,
+                                onPressed: () {
+                                  getImage();
+                                },
+                                icon: Icon(Icons.add_a_photo),
+                                label: Text("Let's take a photo"))
+                          ])
+                    : _image == null
+                        ? Column(
+                            children: <Widget>[
+                              Center(
+                                child: Text(
+                                  'No Image Selected. Please Retake Image.',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                            // bottomLeft
+                                            offset: Offset(-1.0, -1.0),
+                                            color: Colors.black),
+                                        Shadow(
+                                            // bottomRight
+                                            offset: Offset(1.0, -1.0),
+                                            color: Colors.black),
+                                        Shadow(
+                                            // topRight
+                                            offset: Offset(1.0, 1.0),
+                                            color: Colors.black),
+                                        Shadow(
+                                            // topLeft
+                                            offset: Offset(-1.0, 1.0),
+                                            color: Colors.black),
+                                      ]),
+                                ),
+                              ),
+                              RaisedButton.icon(
+                                  onPressed: () {
+                                    getImage();
+                                  },
+                                  icon: Icon(Icons.add_a_photo),
+                                  label: Text("Retake Image"))
+                            ],
+                          )
+                        : _coordinates == null
+                            ? Column(
+                                children: <Widget>[
+                                  Center(
+                                    child: Text(
+                                      'No Location Data. Please Retake Image with Location.',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                          shadows: [
+                                            Shadow(
+                                                // bottomLeft
+                                                offset: Offset(-1.0, -1.0),
+                                                color: Colors.black),
+                                            Shadow(
+                                                // bottomRight
+                                                offset: Offset(1.0, -1.0),
+                                                color: Colors.black),
+                                            Shadow(
+                                                // topRight
+                                                offset: Offset(1.0, 1.0),
+                                                color: Colors.black),
+                                            Shadow(
+                                                // topLeft
+                                                offset: Offset(-1.0, 1.0),
+                                                color: Colors.black),
+                                          ]),
+                                    ),
+                                  ),
+                                  RaisedButton.icon(
+                                      onPressed: () {
+                                        getImage();
+                                      },
+                                      icon: Icon(Icons.repeat),
+                                      label: Text("Retake Image"))
+                                ],
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Image.file(_image),
+                                  RaisedButton.icon(
+                                      onPressed: () {
+                                        _upLButton();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage()));
+                                      },
+                                      icon: Icon(Icons.arrow_upward),
+                                      label: Text("Upload")),
+                                  RaisedButton.icon(
+                                      onPressed: () {
+                                        getImage();
+                                      },
+                                      icon: Icon(Icons.repeat),
+                                      label: Text("Retake Image"))
+                                ],
+                              )),
+          ],
+        ),
       ),
     );
   }
