@@ -15,7 +15,7 @@ class PostListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(posterName + "'s Posts"),
+        title: posterId == userId ? Text("My Posts") : Text(posterName + "'s Posts"),
       ),
       body: new Scaffold(
         body: StreamBuilder<QuerySnapshot>(
@@ -38,7 +38,7 @@ class PostListPage extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (context, index) {
-                    return new ListTile(
+                    return new Card (child: ListTile(
                       leading: Image.network(
                           snapshot.data.documents[index].data['image']),
                       title: Text('Location: ' +
@@ -67,6 +67,7 @@ class PostListPage extends StatelessWidget {
                           ),
                         );
                       },
+                    ),
                     );
                   },
                 ),

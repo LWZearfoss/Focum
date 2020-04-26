@@ -51,15 +51,17 @@ Future<String> uploadImage(image) async {
 }
 
 Future<void> createPost(String downloadURL, List coordinates) async {
-  String address = (await Geolocator()
-          .placemarkFromCoordinates(coordinates[0], coordinates[1]))[0]
-      .thoroughfare;
+  Placemark placemark = (await Geolocator()
+          .placemarkFromCoordinates(coordinates[0], coordinates[1]))[0];
+  String address = placemark.subThoroughfare + ' ' + placemark.thoroughfare + ', ' + placemark.locality + ' ' + placemark.postalCode;
+    
   Firestore.instance.collection('posts').document().setData({
     'image': downloadURL,
     'location': GeoPoint(coordinates[0], coordinates[1]),
     'address': address,
     'userId': userId,
     'userName': userName,
+    'userImage': userImage,
   });
 }
 
