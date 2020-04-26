@@ -29,13 +29,12 @@ class PostMapState extends State<PostMap> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   CameraPosition _locationCamera;
   double pinPosition = -100;
+  Map<String, PinInformation> info = <String, PinInformation>{};
   PinInformation currentlySelectedPin = PinInformation(
       imagePath: '', userPath: '', locationName: '', userName: '');
 
   @override
   void initState() {
-    listenPosts();
-    super.initState();
     Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
         .then((position) {
@@ -46,32 +45,48 @@ class PostMapState extends State<PostMap> {
         );
       });
     });
+    listenPosts();
+    super.initState();
   }
 
   listenPosts() {
     Stream<QuerySnapshot> streamPosts =
         Firestore.instance.collection('posts').snapshots();
     streamPosts.listen((snapshot) {
+      info.clear();
       snapshot.documents.forEach((document) {
-        initMarker(document.data, document.documentID);
+        initMarker(document.data);
       });
     });
   }
 
-  initMarker(post, postId) {
-    final MarkerId markerId = MarkerId(postId);
+  initMarker(post) {
+    final MarkerId markerId = MarkerId(post['address']);
+    if (!info.containsKey(post['address'])) {
+      info[post['address']] = PinInformation(
+        imagePath: post['image'],
+        locationName: post['address'],
+        userName: post['userName'],
+        userPath: post['userImage'],
+        userId: post['userId'],
+      );
+    } else {
+      info[post['address']].posts.add(
+            PostInformation(
+              imagePath: post['image'],
+              locationName: post['address'],
+              userName: post['userName'],
+              userPath: post['userImage'],
+              userId: post['userId'],
+            ),
+          );
+    }
     final Marker marker = Marker(
       markerId: markerId,
       position: LatLng(post['location'].latitude, post['location'].longitude),
       onTap: () {
         setState(() {
-          currentlySelectedPin = PinInformation(
-            imagePath: post['image'],
-            locationName: post['address'],
-            userName: post['userName'],
-            userPath: post['userImage'],
-            userId: post['userId']
-          );
+          currentlySelectedPin = info[post['address']];
           pinPosition = 0;
         });
       },
