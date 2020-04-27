@@ -7,6 +7,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:focum/pin.dart';
 
+///////////////////////////////////////////////
+
 class PostMapPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class PostMapState extends State<PostMap> {
   Map<String, PinInformation> info = <String, PinInformation>{};
   PinInformation currentlySelectedPin = PinInformation(
       imagePath: '', userPath: '', locationName: '', userName: '');
+  BitmapDescriptor _pinLocationIcon;
 
   @override
   void initState() {
@@ -44,6 +47,11 @@ class PostMapState extends State<PostMap> {
           zoom: 14.4746,
         );
       });
+    });
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(.05,.05)), 'assets/pin4.png')
+        .then((onValue) {
+      _pinLocationIcon = onValue;
     });
     listenPosts();
     super.initState();
@@ -84,6 +92,7 @@ class PostMapState extends State<PostMap> {
     final Marker marker = Marker(
       markerId: markerId,
       position: LatLng(post['location'].latitude, post['location'].longitude),
+      icon: _pinLocationIcon,
       onTap: () {
         setState(() {
           currentlySelectedPin = info[post['address']];
