@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:focum/information.dart';
 import 'package:focum/list.dart';
 import 'package:focum/viewer.dart';
+import 'package:focum/post.dart';
 
 // Adapted from https://medium.com/flutter-community/add-a-custom-info-window-to-your-google-map-pins-in-flutter-2e96fdca211a
-
-class PostInformation {
-  String imagePath;
-  String userPath;
-  String locationName;
-  String userName;
-  String userId;
-
-  PostInformation(
-      {this.imagePath,
-      this.userPath,
-      this.locationName,
-      this.userName,
-      this.userId});
-}
 
 class PostTile extends StatelessWidget {
   final PostInformation post;
@@ -64,9 +51,14 @@ class PostTile extends StatelessWidget {
               child: Container(
                 width: 50,
                 height: 50,
-                margin: EdgeInsets.only(left: 10),
+                margin: EdgeInsets.only(
+                  left: 10,
+                ),
                 child: ClipOval(
-                  child: Image.network(post.userPath, fit: BoxFit.cover),
+                  child: Image.network(
+                    post.userPath,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -76,9 +68,8 @@ class PostTile extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PostListPage(
-                        posterId: post.userId,
-                        posterName: post.userName,
+                      builder: (context) => PostPage(
+                        post: post,
                       ),
                     ),
                   );
@@ -130,19 +121,23 @@ class PostTile extends StatelessWidget {
 class PinInformation {
   List<PostInformation> posts = List<PostInformation>();
 
-  PinInformation(
-      {String imagePath,
-      String userPath,
-      String locationName,
-      String userName,
-      String userId}) {
+  PinInformation({
+    String imagePath,
+    String userPath,
+    String locationName,
+    String userName,
+    String userId,
+    String postId,
+  }) {
     this.posts.add(
           PostInformation(
-              imagePath: imagePath,
-              userPath: userPath,
-              locationName: locationName,
-              userName: userName,
-              userId: userId),
+            imagePath: imagePath,
+            userPath: userPath,
+            locationName: locationName,
+            userName: userName,
+            userId: userId,
+            postId: postId,
+          ),
         );
   }
 }

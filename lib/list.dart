@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:focum/auth.dart';
+import 'package:focum/information.dart';
+import 'package:focum/post.dart';
 import 'package:focum/viewer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -15,7 +17,9 @@ class PostListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: posterId == userId ? Text("My Posts") : Text(posterName + "'s Posts"),
+        title: posterId == userId
+            ? Text("My Posts")
+            : Text(posterName + "'s Posts"),
       ),
       body: new Scaffold(
         body: StreamBuilder<QuerySnapshot>(
@@ -38,36 +42,63 @@ class PostListPage extends StatelessWidget {
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: snapshot.data.documents.length,
                   itemBuilder: (context, index) {
-                    return new Card (child: ListTile(
-                      leading: Image.network(
-                          snapshot.data.documents[index].data['image']),
-                      title: Text('Location: ' +
-                          snapshot.data.documents[index].data['address']),
-                      trailing: posterId == userId
-                          ? IconButton(
-                              icon: Icon(Icons.close),
-                              onPressed: () {
-                                Firestore.instance
-                                    .collection('posts')
-                                    .document(snapshot
-                                        .data.documents[index].documentID)
-                                    .delete();
-                              },
-                            )
-                          : null,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FullScreenWrapper(
-                              title: snapshot.data.documents[index].data['address'],
-                              imageProvider: NetworkImage(
-                                  snapshot.data.documents[index].data['image']),
+                    return new Card(
+                      child: ListTile(
+                        leading: InkWell(
+                          child: Image.network(
+                              snapshot.data.documents[index].data['image']),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FullScreenWrapper(
+                                  title: snapshot
+                                      .data.documents[index].data['address'],
+                                  imageProvider: NetworkImage(snapshot
+                                      .data.documents[index].data['image']),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        title: Text('Location: ' +
+                            snapshot.data.documents[index].data['address']),
+                        trailing: posterId == userId
+                            ? IconButton(
+                                icon: Icon(Icons.close),
+                                onPressed: () {
+                                  Firestore.instance
+                                      .collection('posts')
+                                      .document(snapshot
+                                          .data.documents[index].documentID)
+                                      .delete();
+                                },
+                              )
+                            : null,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PostPage(
+                                post: PostInformation(
+                                  imagePath: snapshot
+                                      .data.documents[index].data['image'],
+                                  locationName: snapshot
+                                      .data.documents[index].data['address'],
+                                  userId: snapshot
+                                      .data.documents[index].data['userId'],
+                                  userPath: snapshot
+                                      .data.documents[index].data['userImage'],
+                                  userName: snapshot
+                                      .data.documents[index].data['userName'],
+                                  postId:
+                                      snapshot.data.documents[index].documentID,
+                                ),
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),

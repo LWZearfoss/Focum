@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:focum/information.dart';
 import 'package:focum/pin.dart';
 
 ///////////////////////////////////////////////
@@ -34,7 +35,7 @@ class PostMapState extends State<PostMap> {
   Map<String, PinInformation> info = <String, PinInformation>{};
   PinInformation currentlySelectedPin = PinInformation(
       imagePath: '', userPath: '', locationName: '', userName: '');
-  BitmapDescriptor _pinLocationIcon;
+  BitmapDescriptor customPin;
 
   @override
   void initState() {
@@ -49,9 +50,9 @@ class PostMapState extends State<PostMap> {
       });
     });
     BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(.05,.05)), 'assets/pin4.png')
+            ImageConfiguration(size: Size(.05, .05)), 'assets/map_pin.png')
         .then((onValue) {
-      _pinLocationIcon = onValue;
+      customPin = onValue;
     });
     listenPosts();
     super.initState();
@@ -63,12 +64,12 @@ class PostMapState extends State<PostMap> {
     streamPosts.listen((snapshot) {
       info.clear();
       snapshot.documents.forEach((document) {
-        initMarker(document.data);
+        initMarker(document.data, document.documentID);
       });
     });
   }
 
-  initMarker(post) {
+  initMarker(post, postId) {
     final MarkerId markerId = MarkerId(post['address']);
     if (!info.containsKey(post['address'])) {
       info[post['address']] = PinInformation(
@@ -77,6 +78,7 @@ class PostMapState extends State<PostMap> {
         userName: post['userName'],
         userPath: post['userImage'],
         userId: post['userId'],
+        postId: postId,
       );
     } else {
       info[post['address']].posts.add(
@@ -86,13 +88,14 @@ class PostMapState extends State<PostMap> {
               userName: post['userName'],
               userPath: post['userImage'],
               userId: post['userId'],
+              postId: postId,
             ),
           );
     }
     final Marker marker = Marker(
       markerId: markerId,
       position: LatLng(post['location'].latitude, post['location'].longitude),
-      icon: _pinLocationIcon,
+      icon: customPin,
       onTap: () {
         setState(() {
           currentlySelectedPin = info[post['address']];
