@@ -62,9 +62,11 @@ class PostMapState extends State<PostMap> {
     Stream<QuerySnapshot> streamPosts =
         Firestore.instance.collection('posts').snapshots();
     streamPosts.listen((snapshot) {
-      info.clear();
-      snapshot.documents.forEach((document) {
-        initMarker(document.data, document.documentID);
+      setState(() {
+        info.clear();
+        snapshot.documents.forEach((document) {
+          initMarker(document.data, document.documentID);
+        });
       });
     });
   }
