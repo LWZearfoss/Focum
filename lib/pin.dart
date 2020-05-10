@@ -171,7 +171,7 @@ class MapPinComponentState extends State<MapPinComponent> {
               itemCount: widget.currentlySelectedPin.posts.length,
               itemBuilder: (builder, index) {
                 return SizedBox(
-                  width: 400,
+                  width: MediaQuery.of(context).size.width,
                   child: PostTile(
                     post: widget.currentlySelectedPin.posts[index],
                   ),

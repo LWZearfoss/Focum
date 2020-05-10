@@ -65,7 +65,7 @@ class PostListPage extends StatelessWidget {
                             snapshot.data.documents[index].data['address']),
                         trailing: posterId == userId
                             ? IconButton(
-                                icon: Icon(Icons.close),
+                                icon: Icon(Icons.delete),
                                 onPressed: () {
                                   Firestore.instance
                                       .collection('posts')

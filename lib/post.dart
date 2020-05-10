@@ -37,6 +37,8 @@ class PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.post.userName + "'s Post"),
       ),
@@ -48,143 +50,140 @@ class PostPageState extends State<PostPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    height: MediaQuery.of(context).size.width / 1.5,
-                    child: ClipRect(
-                      child: PhotoView(
-                        imageProvider: NetworkImage(widget.post.imagePath),
-                        maxScale: PhotoViewComputedScale.covered * 2.0,
-                        minScale: PhotoViewComputedScale.contained * 0.8,
-                        initialScale: PhotoViewComputedScale.contained,
-                      ),
-                    ),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: ClipRect(
+                  child: PhotoView(
+                    imageProvider: NetworkImage(widget.post.imagePath),
+                    maxScale: PhotoViewComputedScale.covered * 2.0,
+                    minScale: PhotoViewComputedScale.contained * 0.8,
+                    initialScale: PhotoViewComputedScale.contained,
                   ),
-                  Expanded(
-                    child: Container(
-                      height: MediaQuery.of(context).size.width,
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: Firestore.instance
-                            .collection('comments')
-                            .where("postId", isEqualTo: widget.post.postId)
-                            .snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.hasError) {
-                            return new Text('Error: ${snapshot.error}');
-                          }
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return new Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else {
-                            return new Scrollbar(
-                              child: ListView.builder(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                itemCount: snapshot.data.documents.length,
-                                itemBuilder: (context, index) {
-                                  return new Card(
-                                    child: ListTile(
-                                      leading: Container(
-                                        width: 50,
-                                        height: 50,
-                                        margin: EdgeInsets.only(left: 10),
-                                        child: ClipOval(
-                                          child: Image.network(
-                                            snapshot.data.documents[index]
-                                                .data['userImage'],
-                                            fit: BoxFit.cover,
-                                          ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: MediaQuery.of(context).size.width,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: Firestore.instance
+                      .collection('comments')
+                      .where("postId", isEqualTo: widget.post.postId)
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return new Text('Error: ${snapshot.error}');
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return new Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      return new Scrollbar(
+                        child: ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: snapshot.data.documents.length,
+                          itemBuilder: (context, index) {
+                            return new Card(
+                              child: ListTile(
+                                leading: Container(
+                                  width: 50,
+                                  height: 50,
+                                  margin: EdgeInsets.only(left: 10),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      snapshot.data.documents[index]
+                                          .data['userImage'],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                title: Text(
+                                  snapshot.data.documents[index].data['text'],
+                                ),
+                                subtitle: Text(
+                                  snapshot
+                                      .data.documents[index].data['userName'],
+                                ),
+                                trailing: snapshot.data.documents[index]
+                                            .data['userId'] ==
+                                        userId
+                                    ? IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
                                         ),
+                                        onPressed: () {
+                                          Firestore.instance
+                                              .collection('comments')
+                                              .document(snapshot.data
+                                                  .documents[index].documentID)
+                                              .delete();
+                                        },
+                                      )
+                                    : null,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PostListPage(
+                                        posterId: snapshot.data.documents[index]
+                                            .data['userId'],
+                                        posterName: snapshot.data
+                                            .documents[index].data['userName'],
                                       ),
-                                      title: Text(
-                                        snapshot
-                                            .data.documents[index].data['text'],
-                                      ),
-                                      subtitle: Text(
-                                        snapshot.data.documents[index]
-                                            .data['userName'],
-                                      ),
-                                      trailing: snapshot.data.documents[index]
-                                                  .data['userId'] ==
-                                              userId
-                                          ? IconButton(
-                                              icon: Icon(Icons.close),
-                                              onPressed: () {
-                                                Firestore.instance
-                                                    .collection('comments')
-                                                    .document(snapshot
-                                                        .data
-                                                        .documents[index]
-                                                        .documentID)
-                                                    .delete();
-                                              },
-                                            )
-                                          : null,
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PostListPage(
-                                              posterId: snapshot
-                                                  .data
-                                                  .documents[index]
-                                                  .data['userId'],
-                                              posterName: snapshot
-                                                  .data
-                                                  .documents[index]
-                                                  .data['userName'],
-                                            ),
-                                          ),
-                                        );
-                                      },
                                     ),
                                   );
                                 },
                               ),
                             );
-                          }
-                        },
-                      ),
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Material(
+                elevation: 20.0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(3.0),
                     ),
                   ),
-                  Material(
-                    elevation: 20.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(3.0),
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 10.0,
+                    top: 10.0,
+                    left: 10.0,
+                    right: 10.0,
+                  ),
+                  child: TextField(
+                    controller: commentController,
+                    decoration: InputDecoration(
+                      hintText: 'Leave a comment',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          Icons.clear,
+                          size: 20.0,
                         ),
-                      ),
-                      padding: EdgeInsets.all(10.0),
-                      child: TextField(
-                        controller: commentController,
-                        decoration: InputDecoration(
-                          hintText: 'Leave a comment',
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              size: 20.0,
-                            ),
-                            onPressed: () {
-                              commentController.clear();
-                            },
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(40)),
-                          ),
-                        ),
-                        onSubmitted: (String text) {
-                          createComment(text);
+                        onPressed: () {
                           commentController.clear();
                         },
                       ),
                     ),
+                    onSubmitted: (String text) {
+                      if (text != "") {
+                        createComment(text);
+                        commentController.clear();
+                      }
+                    },
                   ),
-                ],
+                ),
               ),
             ),
           ],
